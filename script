@@ -43,6 +43,7 @@ case "$ans" in
 	y|Y) echo "Great, here we go"
 	;;
 	n|N) echo "Ok, i guess you dont want to do this work dude"
+	echo $(rm /home/$home/mailuserslist$date /home/$home/exprt_$home)
 	exit 0
 	;;
 	*) echo "One more time: y or n"
@@ -51,13 +52,20 @@ esac
 echo
 
 #making mysql dump
-echo "MYSQL Password:"
-if mysqldump -u root -p $dbname > /home/$home/$dbname$date.sql
-	then
-	echo "Database was copied in /home/$home/$dbname$date.sql" >> /home/$home/exprt_$home
-	else
-	echo "Its some problems here, try by hands"
-fi
+case "$db" in
+	y|Y)echo "MYSQL Password:"
+	if mysqldump -u root -p $dbname > /home/$home/$dbname$date.sql
+		then
+		echo "Database was copied in /home/$home/$dbname$date.sql" >> /home/$home/exprt_$home
+		else
+		echo "Its some problems here, try by hands"
+	fi
+	;;
+	n|N) echo "You choosed "no database" for this hompage"
+	;;
+	*) echo "Wrong parametr in parametr db. Databasr didnt copyed. Choose there y or n"
+	;;
+esac
 
 #Write virtualhost parametrs in transfer file
 echo -e "\e[34mCopying virtualhost.conf settings for $home\e[0m"
