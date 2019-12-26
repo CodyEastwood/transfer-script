@@ -12,6 +12,7 @@ if touch /home/$home/exprt_$home
 		echo -e "\e[34mTransfer /home/$home/exprt_$home created\e[0m"
 	else
 		echo "Cant create transfer file, exit script"
+		exit 0
 fi
 echo
 
@@ -36,18 +37,18 @@ echo
 
 #brake
 
-echo -n "Now make users on $trgtsrvr. After this press y"
+echo -n "Make users on $trgtsrvr. When users done press y, or press n to exit script: "
 
 read ans
 case "$ans" in
 	y|Y) echo "Great, here we go"
 	;;
-	n|N) echo "Ok, i guess you dont want to do this work dude"
+	n|N) echo "Before exit script press y if you want to delete a file created by the script."
 	echo $(rm /home/$home/mailuserslist$date /home/$home/exprt_$home)
 	exit 0
 	;;
-	*) echo "One more time: y or n"
-	;;
+#	*) echo "One more time: y or n"
+#	;;
 esac
 echo
 
@@ -63,34 +64,51 @@ case "$db" in
 	;;
 	n|N) echo "You choosed "no database" for this hompage"
 	;;
-	*) echo "Wrong parametr in parametr db. Databasr didnt copyed. Choose there y or n"
+	*) echo "Wrong parametr in parametr db. Databasr didnt copyed."
 	;;
 esac
 
 #Write virtualhost parametrs in transfer file
 echo -e "\e[34mCopying virtualhost.conf settings for $home\e[0m"
-echo -e "\e[31mHERE IS WHAT I COPYED.\e[0m"
-echo "<VirtualHost $trgtsrvr:80>"
-sed -n "/${home}/p" /usr/local/apache/conf/virtualhost.conf
-echo "</VirtualHost>"
-echo "<VirtualHost $trgtsrvr:80>" >> /home/$home/exprt_$home
-sed -n "/${home}/p" /usr/local/apache/conf/virtualhost.conf >> /home/$home/exprt_$home
-echo "</VirtualHost>" >> /home/$home/exprt_$home
-echo
+
 echo -e "\e[31mHERE IS ALL WHAT $home HAVE IN APACHE CONFIGURATIONS. CHECK IT!\e[0m"
 cd /usr/local/apache/conf
-echo $(grep -rni "$home" *)
+grep -rni -C2 "$home" *
 cd
 echo
 
+echo "input CBandLimit "
+read cdlim
+
+#echo -e "\e[31mHERE IS WHAT I COPYED.\e[0m"
+#echo "<VirtualHost $trgtsrvr:80>"
+#sed -n "/${home}/p" /usr/local/apache/conf/virtualhost.conf
+#echo "CBandLimit $cdlim"
+#echo "CBandPeriod 1D"
+#echo "</VirtualHost>"
+
+echo "<VirtualHost $trgtsrvr:80>" >> /home/$home/exprt_$home
+sed -n "/${home}/p" /usr/local/apache/conf/virtualhost.conf >> /home/$home/exprt_$home
+sed -e '/Directory/d'; '/Transfer/d'; '/Limit/d' /home/$home/exprt_$home
+echo "CBandLimit $cdlim" >> /home/$home/exprt_$home
+echo "CBandPeriod 1D" >> /home/$home/exprt_$home
+echo "</VirtualHost>" >> /home/$home/exprt_$home
+echo
+
+echo -e "\e[31mHERE IS WHAT I COPYED.\e[0m"
+
+sed -n '/VirtualHost/,$p' /home/$home/exprt_$home
+
 #cheking virtustable and local-host-name
 echo -e "\e[31mvirtustable settings\e[0m"
-echo $(cat /etc/mail/virtusertable | grep $home)
+cat /etc/mail/virtusertable | grep $home
 echo
 echo "virtustable settings" >> /home/$home/exprt_$home
-echo $(cat /etc/mail/virtusertable | grep $home) >> /home/$home/exprt_$home
+cat /etc/mail/virtusertable | grep $home >> /home/$home/exprt_$home
+cat /etc/mail/virtusertable | grep $home
 #sed -n "/${home}/p" /etc/mail/virtusertable >> /home/$home/exprt_$home
 echo -e "\e[31mlocal-host-name settings\e[0m"
+cat /etc/mail/local-host-names | grep $home
 cat /etc/mail/local-host-names | grep $home >> /home/$home/exprt_$home
 echo
 
@@ -102,12 +120,13 @@ echo
 echo -e "\e[31mShould I rsync this folder to server $trgtsrvr? Choose y or n:\e[0m"
 read rsans
 case "$rsans" in
-	y|Y) echo -n $(rsync -avr /home/$home/ $trgtsrvr::home/$home/)
+	y|Y) rsync -avr /home/$home/ $trgtsrvr::home/$home/
 	;;
 	n|N) echo "Exit script"
 	exit
 	;;
-        *) echo "One more time: y or n"
+        *) echo "Exit script"
+	exit 0
         ;;
 esac
 
