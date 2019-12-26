@@ -105,8 +105,7 @@ cat /etc/mail/virtusertable | grep $home
 echo
 echo "virtustable settings" >> /home/$home/exprt_$home
 cat /etc/mail/virtusertable | grep $home >> /home/$home/exprt_$home
-cat /etc/mail/virtusertable | grep $home
-#sed -n "/${home}/p" /etc/mail/virtusertable >> /home/$home/exprt_$home
+
 echo -e "\e[31mlocal-host-name settings\e[0m"
 cat /etc/mail/local-host-names | grep $home
 cat /etc/mail/local-host-names | grep $home >> /home/$home/exprt_$home
