@@ -2,7 +2,6 @@
 
 home="jeiltrx.co.kr"
 dblogin="jeiltrx"
-dbpass="hd970648"
 dbname="jeiltrx"
 trgtsrvr="119.207.79.150"
 date=$(date +%Y%m%d)
@@ -95,7 +94,7 @@ echo
 echo -e "\e[31mShould I rsync this folder to server $trgtsrvr? Choose y or n:\e[0m"
 read rsans
 case "$rsans" in
-	y|Y) echo $(rsync -avr /home/$home/ $trgtsrvr::home/$home/)
+	y|Y) echo -n $(rsync -avr /home/$home/ $trgtsrvr::home/$home/)
 	;;
 	n|N) echo "Exit script"
 	exit
